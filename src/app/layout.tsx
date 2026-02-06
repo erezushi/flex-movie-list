@@ -1,19 +1,14 @@
-import type { Metadata } from 'next';
+'use client'
+
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { Provider } from 'react-redux';
+import store from '@/store';
 
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
 });
-
-export const metadata: Metadata = {
-  title: {
-    template: 'Flex Movie List - %s',
-    default: 'Flex Movie List',
-  },
-  description: 'Flex Systems technical exam from Erez Bracha',
-};
 
 export default function RootLayout({
   children,
@@ -22,7 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable}`}>{children}</body>
+      <Provider store={store}>
+        <body className={`${inter.variable}`}>{children}</body>
+      </Provider>
     </html>
   );
 }
