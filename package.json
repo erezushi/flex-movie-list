@@ -14,7 +14,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-redux": "^9.2.0",
-    "redux-saga": "^1.4.2"
+    "redux-saga": "^1.4.2",
+    "tmdb-ts": "^2.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",

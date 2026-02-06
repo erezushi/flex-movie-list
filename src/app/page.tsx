@@ -1,20 +1,15 @@
-import { Metadata } from 'next';
-import styles from './page.module.css';
+'use client'
 
-export const metadata: Metadata = {
-  title: {
-    template: 'Flex Movie List - %s',
-    default: 'Flex Movie List',
-  },
-  description: 'Flex Systems technical exam from Erez Bracha',
-};
+import { Provider } from 'react-redux';
+import styles from './page.module.css';
+import store from '@/store';
 
 export default function Home() {
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        
-      </main>
+      <Provider store={store}>
+        <main className={styles.main}></main>
+      </Provider>
     </div>
   );
 }

@@ -1,21 +1,24 @@
+import { DisplayMode, MovieState } from '@/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState = JSON.parse(localStorage.getItem('favorites') ?? '[]') as number [];
+const initialState: MovieState = {
+  displayMode: 'popular',
+  currentPage: 1,
+};
 
 export const movieSlice = createSlice({
   name: 'movies',
   initialState,
   reducers: {
-    addFavorite: (state, action: PayloadAction<number>) => {
-      state.push(action.payload);
+    changeDisplayMode: (state, action: PayloadAction<DisplayMode>) => {
+      state.displayMode = action.payload;
     },
-    removeFavorite: (state, action: PayloadAction<number>) => {
-      state = state.filter((favoriteId) => favoriteId !== action.payload);
-      localStorage.setItem('favorites', JSON.stringify(state));
+    changePage: (state, action: PayloadAction<number>) => {
+      state.currentPage = action.payload;
     },
   },
 });
 
-export const { addFavorite, removeFavorite } = movieSlice.actions;
+export const { changeDisplayMode, changePage } = movieSlice.actions;
 
 export default movieSlice.reducer;
