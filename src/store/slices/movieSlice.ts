@@ -6,7 +6,7 @@ const initialState: MovieState = {
   displayMode: 'popular',
   currentPage: 1,
   favorites: [],
-  movieList: []
+  movieList: [],
 };
 
 export const movieSlice = createSlice({
@@ -15,9 +15,11 @@ export const movieSlice = createSlice({
   reducers: {
     displayPopular: (state) => {
       state.displayMode = 'popular';
+      state.currentPage = 1;
     },
     displayPlaying: (state) => {
       state.displayMode = 'playing';
+      state.currentPage = 1;
     },
     displayFavorites: (state) => {
       state.displayMode = 'favorites';
@@ -25,7 +27,7 @@ export const movieSlice = createSlice({
     nextPage: (state) => {
       state.currentPage += 1;
     },
-    prviousPage: (state) => {
+    previousPage: (state) => {
       state.currentPage -= 1;
     },
     addFavorite: (state, action: PayloadAction<number>) => {
@@ -35,8 +37,8 @@ export const movieSlice = createSlice({
       state.favorites = state.favorites.filter((movieId) => movieId !== action.payload);
     },
     setMovieList: (state, action: PayloadAction<Movie[]>) => {
-      state.movieList = action.payload
-    }
+      state.movieList = action.payload;
+    },
   },
 });
 
@@ -45,10 +47,10 @@ export const {
   displayPlaying,
   displayFavorites,
   nextPage,
-  prviousPage,
+  previousPage,
   addFavorite,
   removeFavorite,
-  setMovieList
+  setMovieList,
 } = movieSlice.actions;
 
 export default movieSlice.reducer;
