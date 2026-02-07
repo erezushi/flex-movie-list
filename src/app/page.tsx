@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import { Provider } from 'react-redux';
+import { useAppDispatch } from '@/store/hooks';
+
 import styles from './page.module.css';
-import store from '@/store';
 
 export default function Home() {
+  const dispatch = useAppDispatch();
+
   return (
     <div className={styles.page}>
-      <Provider store={store}>
-        <main className={styles.main}></main>
-      </Provider>
+      <main className={styles.main}></main>
     </div>
   );
 }

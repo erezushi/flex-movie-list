@@ -5,11 +5,13 @@ import rootSaga from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
 
-const store = configureStore({
+
+export const makeStore = () => configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sagaMiddleware),
 });
 
 sagaMiddleware.run(rootSaga);
 
-export default store;
+export type AppStore = ReturnType<typeof makeStore>
+export type AppDispatch = AppStore['dispatch'];

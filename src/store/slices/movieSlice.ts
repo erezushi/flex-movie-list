@@ -1,24 +1,54 @@
-import { DisplayMode, MovieState } from '@/types';
+import { Movie } from 'tmdb-ts';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { MovieState } from '@/types';
 
 const initialState: MovieState = {
   displayMode: 'popular',
   currentPage: 1,
+  favorites: [],
+  movieList: []
 };
 
 export const movieSlice = createSlice({
   name: 'movies',
   initialState,
   reducers: {
-    changeDisplayMode: (state, action: PayloadAction<DisplayMode>) => {
-      state.displayMode = action.payload;
+    displayPopular: (state) => {
+      state.displayMode = 'popular';
     },
-    changePage: (state, action: PayloadAction<number>) => {
-      state.currentPage = action.payload;
+    displayPlaying: (state) => {
+      state.displayMode = 'playing';
     },
+    displayFavorites: (state) => {
+      state.displayMode = 'favorites';
+    },
+    nextPage: (state) => {
+      state.currentPage += 1;
+    },
+    prviousPage: (state) => {
+      state.currentPage -= 1;
+    },
+    addFavorite: (state, action: PayloadAction<number>) => {
+      state.favorites.push(action.payload);
+    },
+    removeFavorite: (state, action: PayloadAction<number>) => {
+      state.favorites = state.favorites.filter((movieId) => movieId !== action.payload);
+    },
+    setMovieList: (state, action: PayloadAction<Movie[]>) => {
+      state.movieList = action.payload
+    }
   },
 });
 
-export const { changeDisplayMode, changePage } = movieSlice.actions;
+export const {
+  displayPopular,
+  displayPlaying,
+  displayFavorites,
+  nextPage,
+  prviousPage,
+  addFavorite,
+  removeFavorite,
+  setMovieList
+} = movieSlice.actions;
 
 export default movieSlice.reducer;
