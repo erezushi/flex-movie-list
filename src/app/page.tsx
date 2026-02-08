@@ -1,22 +1,64 @@
 'use client';
 
+import { Button } from '@mui/material';
+import Image from 'next/image';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { displayFavorites, displayPlaying, displayPopular } from '@/store/slices/movieSlice';
 
-import styles from './page.module.css';
-
-export default function Home() {
+const Home = () => {
   const dispatch = useAppDispatch();
-  const { displayMode, currentPage } = useAppSelector((state) => {
-    const { displayMode, currentPage } = state.movies;
-
-    return { displayMode, currentPage };
-  });
+  const displayMode = useAppSelector((state) => state.movies.displayMode);
+  const currentPage = useAppSelector((state) => state.movies.currentPage);
+  const movieList = useAppSelector((state) => state.movies.movieList);
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        
+    <>
+      <main>
+        <Button
+          variant="text"
+          onClick={() => dispatch(displayPopular())}
+          disabled={displayMode === 'popular'}
+        >
+          Popular
+        </Button>
+        |
+        <Button
+          variant="text"
+          onClick={() => dispatch(displayPlaying())}
+          disabled={displayMode === 'playing'}
+        >
+          Now Playing
+        </Button>
+        |
+        <Button
+          variant="text"
+          onClick={() => dispatch(displayFavorites())}
+          disabled={displayMode === 'favorites'}
+        >
+          Favorites
+        </Button>
+        <div className="movie-list">
+          {movieList.map((movieObj) => (
+            <div className="movie" key={movieObj.movie.id}>
+              <Image
+                className="movie-poster"
+                alt={`${movieObj.movie.title} poster`}
+                src={`https://image.tmdb.org/t/p/original${movieObj.movie.poster_path}`}
+                width={movieObj.poster.width}
+                height={movieObj.poster.height}
+              />
+              <span className="movie-title">
+                {movieObj.movie.title}
+              </span>
+              <span className="release-year">
+                {movieObj.movie.release_date.substring(0,4)}
+              </span>
+            </div>
+          ))}
+        </div>
       </main>
-    </div>
+    </>
   );
-}
+};
+
+export default Home;
