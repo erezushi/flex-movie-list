@@ -4,6 +4,7 @@ import { MovieDetails, MovieState } from '@/types';
 const initialState: MovieState = {
   displayMode: 'popular',
   currentPage: 1,
+  totalPages: 0,
   favorites: [],
   movieList: [],
 };
@@ -26,8 +27,17 @@ export const movieSlice = createSlice({
     nextPage: (state) => {
       state.currentPage += 1;
     },
+    lastPage: (state) => {
+      state.currentPage = state.totalPages;
+    },
     previousPage: (state) => {
       state.currentPage -= 1;
+    },
+    firstPage: (state) => {
+      state.currentPage = 1;
+    },
+    setTotalPages: (state, action: PayloadAction<number>) => {
+      state.totalPages = action.payload;
     },
     addFavorite: (state, action: PayloadAction<number>) => {
       state.favorites.push(action.payload);
@@ -46,7 +56,10 @@ export const {
   displayPlaying,
   displayFavorites,
   nextPage,
+  lastPage,
   previousPage,
+  firstPage,
+  setTotalPages,
   addFavorite,
   removeFavorite,
   setMovieList,

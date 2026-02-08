@@ -1,16 +1,19 @@
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
-import { Image, MovieDiscoverResult } from 'tmdb-ts';
+import { Image } from 'tmdb-ts';
 import { discoverMovies, getMoviePosters } from '@/api';
 import {
   addFavorite,
   displayPlaying,
   displayPopular,
   nextPage,
+  lastPage,
   previousPage,
+  firstPage,
   removeFavorite,
   setMovieList,
+  setTotalPages,
 } from '../slices/movieSlice';
-import type { MovieState } from '@/types';
+import type { MovieState, MovieDiscoverResults } from '@/types';
 
 export function* saveFavorites() {
   const state = (yield select((state) => state.movies)) as MovieState;
@@ -21,24 +24,27 @@ export function* saveFavorites() {
 export function* fetchMovieList() {
   const state = (yield select((state) => state.movies)) as MovieState;
 
-  const discoverRes = (yield call(discoverMovies, {
-    page: state.currentPage,
-    sort_by: 'popularity.desc',
-    // Both Popular and Now Playing calls are Discover calls sorted by popularity.
-    // Release types 2 and 3 are theatrical (limited) and theatrical, empty string is the same as just Popular
-    with_release_type: state.displayMode === 'playing' ? '2|3' : '',
-  })) as MovieDiscoverResult;
+  const discoverRes = (yield call(
+    discoverMovies,
+    state.displayMode,
+    state.currentPage,
+  )) as MovieDiscoverResults;
 
   const posterLists = (yield all(
-    discoverRes.results.map((movie) => getMoviePosters(movie.id))
+    discoverRes.movies.map((movie) => getMoviePosters(movie.id)),
   )) as Image[][];
 
-  const movieList = discoverRes.results.map((movie, index) => ({
+  const movieList = discoverRes.movies.map((movie, index) => ({
     movie,
-    poster: posterLists[index].find((poster) => poster.file_path === movie.poster_path)!
-  }))
+    poster:
+      posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
+      posterLists[index][0],
+  }));
 
   yield put(setMovieList(movieList));
+
+  // TMDB API only accepts pages up to 500, even if it returns more than that
+  yield put(setTotalPages(Math.min(discoverRes.pages, 500)));
 }
 
 export function* watchFavoritesChange() {
@@ -47,7 +53,14 @@ export function* watchFavoritesChange() {
 
 export function* watchDisplayChange() {
   yield takeEvery(
-    [displayPopular.type, displayPlaying.type, nextPage.type, previousPage.type],
+    [
+      displayPopular.type,
+      displayPlaying.type,
+      nextPage.type,
+      lastPage.type,
+      previousPage.type,
+      firstPage.type,
+    ],
     fetchMovieList,
   );
 }
