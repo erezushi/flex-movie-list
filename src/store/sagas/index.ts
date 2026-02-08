@@ -1,6 +1,6 @@
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
-import { MovieDiscoverResult } from 'tmdb-ts';
-import { discoverMovies } from '@/api';
+import { Image, MovieDiscoverResult } from 'tmdb-ts';
+import { discoverMovies, getMoviePosters } from '@/api';
 import {
   addFavorite,
   displayPlaying,
@@ -29,7 +29,16 @@ export function* fetchMovieList() {
     with_release_type: state.displayMode === 'playing' ? '2|3' : '',
   })) as MovieDiscoverResult;
 
-  yield put(setMovieList(discoverRes.results));
+  const posterLists = (yield all(
+    discoverRes.results.map((movie) => getMoviePosters(movie.id))
+  )) as Image[][];
+
+  const movieList = discoverRes.results.map((movie, index) => ({
+    movie,
+    poster: posterLists[index].find((poster) => poster.file_path === movie.poster_path)!
+  }))
+
+  yield put(setMovieList(movieList));
 }
 
 export function* watchFavoritesChange() {
@@ -46,4 +55,3 @@ export function* watchDisplayChange() {
 export default function* rootSaga() {
   yield all([watchFavoritesChange(), watchDisplayChange()]);
 }
-

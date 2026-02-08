@@ -1,6 +1,5 @@
-import { Movie } from 'tmdb-ts';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MovieState } from '@/types';
+import { MovieDetails, MovieState } from '@/types';
 
 const initialState: MovieState = {
   displayMode: 'popular',
@@ -36,7 +35,7 @@ export const movieSlice = createSlice({
     removeFavorite: (state, action: PayloadAction<number>) => {
       state.favorites = state.favorites.filter((movieId) => movieId !== action.payload);
     },
-    setMovieList: (state, action: PayloadAction<Movie[]>) => {
+    setMovieList: (state, action: PayloadAction<MovieDetails[]>) => {
       state.movieList = action.payload;
     },
   },
