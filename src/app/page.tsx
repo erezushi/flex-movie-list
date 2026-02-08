@@ -1,14 +1,30 @@
 'use client';
 
-import { Button } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import Image from 'next/image';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { displayFavorites, displayPlaying, displayPopular } from '@/store/slices/movieSlice';
+import {
+  displayFavorites,
+  displayPlaying,
+  displayPopular,
+  firstPage,
+  lastPage,
+  nextPage,
+  previousPage,
+} from '@/store/slices/movieSlice';
+import {
+  ChevronLeftRounded,
+  ChevronRightRounded,
+  FirstPageRounded,
+  ImageNotSupportedRounded,
+  LastPageRounded,
+} from '@mui/icons-material';
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const displayMode = useAppSelector((state) => state.movies.displayMode);
   const currentPage = useAppSelector((state) => state.movies.currentPage);
+  const totalPages = useAppSelector((state) => state.movies.totalPages);
   const movieList = useAppSelector((state) => state.movies.movieList);
 
   return (
@@ -37,25 +53,51 @@ const Home = () => {
         >
           Favorites
         </Button>
-        <div className="movie-list">
-          {movieList.map((movieObj) => (
-            <div className="movie" key={movieObj.movie.id}>
-              <Image
-                className="movie-poster"
-                alt={`${movieObj.movie.title} poster`}
-                src={`https://image.tmdb.org/t/p/original${movieObj.movie.poster_path}`}
-                width={movieObj.poster.width}
-                height={movieObj.poster.height}
-              />
-              <span className="movie-title">
-                {movieObj.movie.title}
-              </span>
-              <span className="release-year">
-                {movieObj.movie.release_date.substring(0,4)}
-              </span>
+        {displayMode === 'favorites' ? (
+          <></>
+        ) : (
+          <div className="movie-list">
+            {movieList.map((movieObj) => (
+              <div className="movie" key={movieObj.movie.id}>
+                {movieObj.poster ? (
+                  <Image
+                    className="movie-poster"
+                    alt={`${movieObj.movie.title} poster`}
+                    src={`https://image.tmdb.org/t/p/original${movieObj.poster.file_path}`}
+                    width={movieObj.poster.width}
+                    height={movieObj.poster.height}
+                  />
+                ) : (
+                  <div className="missing-poster">
+                    <ImageNotSupportedRounded fontSize="large" />
+                    Poster Missing
+                  </div>
+                )}
+                <span className="movie-title">{movieObj.movie.title}</span>
+                <span className="release-year">{movieObj.movie.release_date.substring(0, 4)}</span>
+              </div>
+            ))}
+            <br />
+            <div className="pagination">
+              <IconButton onClick={() => dispatch(firstPage())} disabled={currentPage <= 2}>
+                <FirstPageRounded />
+              </IconButton>
+              <IconButton onClick={() => dispatch(previousPage())} disabled={currentPage <= 1}>
+                <ChevronLeftRounded />
+              </IconButton>
+              {currentPage} / {totalPages}
+              <IconButton onClick={() => dispatch(nextPage())} disabled={currentPage >= totalPages}>
+                <ChevronRightRounded />
+              </IconButton>
+              <IconButton
+                onClick={() => dispatch(lastPage())}
+                disabled={currentPage >= totalPages - 1}
+              >
+                <LastPageRounded />
+              </IconButton>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </main>
     </>
   );
