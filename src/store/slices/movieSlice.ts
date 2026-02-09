@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MovieDetails, MovieState } from '@/types';
+import { MovieWithPoster, MovieState } from '@/types';
 
 const initialState: MovieState = {
   displayMode: 'popular',
@@ -45,8 +45,12 @@ export const movieSlice = createSlice({
     removeFavorite: (state, action: PayloadAction<number>) => {
       state.favorites = state.favorites.filter((movieId) => movieId !== action.payload);
     },
-    setMovieList: (state, action: PayloadAction<MovieDetails[]>) => {
+    setMovieList: (state, action: PayloadAction<MovieWithPoster[]>) => {
       state.movieList = action.payload;
+    },
+    // Used if movie detail page is loaded without the movie in movieList
+    setSingleMovie: (state, action: PayloadAction<number>) => {
+      state.singleMovie = action.payload;
     },
   },
 });
@@ -63,6 +67,7 @@ export const {
   addFavorite,
   removeFavorite,
   setMovieList,
+  setSingleMovie
 } = movieSlice.actions;
 
 export default movieSlice.reducer;

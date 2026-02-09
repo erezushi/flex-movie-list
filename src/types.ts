@@ -1,4 +1,4 @@
-import { Image, Movie } from 'tmdb-ts';
+import { Image, Movie, MovieDetails } from 'tmdb-ts';
 
 export type DisplayMode = 'popular' | 'playing' | 'favorites';
 
@@ -7,8 +7,8 @@ export interface MovieDiscoverResults {
   pages: number
 }
 
-export interface MovieDetails {
-  movie: Movie;
+export interface MovieWithPoster {
+  movie: Movie | MovieDetails;
   poster: Image;
 }
 
@@ -16,6 +16,7 @@ export interface MovieState {
   displayMode: DisplayMode;
   currentPage: number;
   totalPages: number;
-  movieList: MovieDetails[];
+  movieList: MovieWithPoster[];
   favorites: number[];
+  singleMovie?: number;
 }

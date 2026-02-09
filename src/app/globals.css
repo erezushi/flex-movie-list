@@ -6,6 +6,11 @@ div.movie-list {
   justify-content: center;
 }
 
+a.movie-link {
+  text-decoration: none;
+  color: black;
+}
+
 div.movie {
   display: flex;
   flex-direction: column;
