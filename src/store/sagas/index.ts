@@ -1,5 +1,5 @@
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
-import { Image, Movie } from 'tmdb-ts';
+import { Image } from 'tmdb-ts';
 import { discoverMovies, getMoviePosters, getSingleMovie } from '@/api';
 import {
   addFavorite,
@@ -15,7 +15,6 @@ import {
   setSingleMovie,
 } from '../slices/movieSlice';
 import type { MovieState, MovieDiscoverResults } from '@/types';
-import { Action } from 'redux-saga';
 import { PayloadAction } from '@reduxjs/toolkit';
 
 export function* saveFavorites() {
