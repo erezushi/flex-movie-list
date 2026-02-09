@@ -1,14 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { MovieWithPoster, MovieState } from '@/types';
+import { discoverMovies, getMoviePosters } from '@/api';
 
 const localFavorites = localStorage.getItem('favorites');
+
+const discoverRes = await discoverMovies('popular', 1);
+const posterLists = await Promise.all(discoverRes.movies.map((movieObj) => getMoviePosters(movieObj.id)));
+
+const movieList = discoverRes.movies.map((movie, index) => ({
+    movie,
+    poster:
+      posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
+      posterLists[index][0],
+  }));
 
 const initialState: MovieState = {
   displayMode: 'popular',
   currentPage: 1,
-  totalPages: 0,
+  totalPages: Math.min(discoverRes.pages, 500),
   favorites: localFavorites ? JSON.parse(localFavorites) : [],
-  movieList: [],
+  movieList,
 };
 
 export const movieSlice = createSlice({
