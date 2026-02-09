@@ -1,0 +1,31 @@
+div.details {
+  display: flex;
+  align-items: center;
+}
+
+img.details-poster {
+  width: 20vw;
+  height: auto;
+
+  margin-right: 1em;
+}
+
+div.missing-poster {
+  width: 20vw;
+  height: 30vw;
+
+  margin-right: 1em;
+}
+
+div.text-details {
+  width: calc(80vw - 1em)
+}
+
+span.details-title {
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+span.movie-overview {
+  font-size: large;
+}

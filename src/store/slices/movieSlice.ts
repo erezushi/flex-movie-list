@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { MovieWithPoster, MovieState } from '@/types';
 
+const localFavorites = localStorage.getItem('favorites');
+
 const initialState: MovieState = {
   displayMode: 'popular',
   currentPage: 1,
   totalPages: 0,
-  favorites: [],
+  favorites: localFavorites ? JSON.parse(localFavorites) : [],
   movieList: [],
 };
 
