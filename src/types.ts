@@ -25,3 +25,8 @@ export interface SearchState {
   query: string;
   results: MovieWithPoster[];
 }
+
+export interface RequestState {
+  isLoading: boolean;
+  error: string;
+}

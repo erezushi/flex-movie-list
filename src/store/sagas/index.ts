@@ -18,6 +18,7 @@ import {
 import type { MovieState, MovieDiscoverResults } from '@/types';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { setQuery, setSearchResults } from '../slices/searchSlice';
+import { setError, startLoading, stopLoading } from '../slices/requestSlice';
 
 // Movie Sagas
 
@@ -30,68 +31,95 @@ export function* saveFavorites() {
 export function* fetchMovieList() {
   const state: MovieState = yield select((state) => state.movies);
 
-  const discoverRes: MovieDiscoverResults = yield call(
-    discoverMovies,
-    state.displayMode,
-    state.currentPage,
-  );
+  yield put(startLoading());
+  yield put(setError(''));
 
-  const posterLists: Image[][] = yield all(
-    discoverRes.movies.map((movie) => getMoviePosters(movie.id)),
-  );
+  try {
+    const discoverRes: MovieDiscoverResults = yield call(
+      discoverMovies,
+      state.displayMode,
+      state.currentPage,
+    );
 
-  const movieList = discoverRes.movies.map((movie, index) => ({
-    movie,
-    poster:
-      posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
-      posterLists[index][0],
-  }));
+    const posterLists: Image[][] = yield all(
+      discoverRes.movies.map((movie) => getMoviePosters(movie.id)),
+    );
 
-  yield put(setMovieList(movieList));
+    const movieList = discoverRes.movies.map((movie, index) => ({
+      movie,
+      poster:
+        posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
+        posterLists[index][0],
+    }));
 
-  // TMDB API only accepts pages up to 500, even if it returns more than that
-  yield put(setTotalPages(Math.min(discoverRes.pages, 500)));
+    yield put(setMovieList(movieList));
+
+    // TMDB API only accepts pages up to 500, even if it returns more than that
+    yield put(setTotalPages(Math.min(discoverRes.pages, 500)));
+  } catch (error) {
+    yield put(setError((error as { message: string }).message));
+  }
+
+  yield put(stopLoading());
 }
 
 export function* fetchFavorites() {
   const state: MovieState = yield select((state) => state.movies);
 
-  const movieDetails: Awaited<ReturnType<typeof getSingleMovie>>[] = yield all(
-    state.favorites.map((favoriteId) => getSingleMovie(favoriteId)),
-  );
+  yield put(startLoading());
+  yield put(setError(''));
 
-  const posterLists: Image[][] = yield all(
-    state.favorites.map((favoriteId) => getMoviePosters(favoriteId)),
-  );
+  try {
+    const movieDetails: Awaited<ReturnType<typeof getSingleMovie>>[] = yield all(
+      state.favorites.map((favoriteId) => getSingleMovie(favoriteId)),
+    );
 
-  const movieList = movieDetails.map((movie, index) => ({
-    movie,
-    poster:
-      posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
-      posterLists[index][0],
-  }));
+    const posterLists: Image[][] = yield all(
+      state.favorites.map((favoriteId) => getMoviePosters(favoriteId)),
+    );
 
-  yield put(setMovieList(movieList));
+    const movieList = movieDetails.map((movie, index) => ({
+      movie,
+      poster:
+        posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
+        posterLists[index][0],
+    }));
+
+    yield put(setMovieList(movieList));
+  } catch (error) {
+    yield put(setError((error as { message: string }).message));
+  }
+
+  yield put(stopLoading());
 }
 
 export function* fetchSingleMovie(action: PayloadAction<number>) {
-  const movieDetails: Awaited<ReturnType<typeof getSingleMovie>> = yield call(
-    getSingleMovie,
-    action.payload,
-  );
+  yield put(startLoading());
+  yield put(setError(''));
 
-  const posterList: Image[] = yield call(getMoviePosters, action.payload);
+  try {
+    const movieDetails: Awaited<ReturnType<typeof getSingleMovie>> = yield call(
+      getSingleMovie,
+      action.payload,
+    );
 
-  yield put(
-    setMovieList([
-      {
-        movie: movieDetails,
-        poster:
-          posterList.find((poster) => poster.file_path === movieDetails.poster_path) ??
-          posterList[0],
-      },
-    ]),
-  );
+    const posterList: Image[] = yield call(getMoviePosters, action.payload);
+
+    yield put(
+      setMovieList([
+        {
+          movie: movieDetails,
+          poster:
+            posterList.find((poster) => poster.file_path === movieDetails.poster_path) ??
+            posterList[0],
+        },
+      ]),
+    );
+  } catch (error) {
+    yield put(setError((error as { message: string }).message));
+  }
+
+  yield put(startLoading());
 }
 
 export function* watchFavoritesChange() {
@@ -129,29 +157,42 @@ export function* movieSearchWorker(action: PayloadAction<string>) {
   const searchQuery = action.payload;
 
   if (searchQuery.length >= 2 && timesSearched < 5) {
-    const searchResults: Movie[] = yield call(searchMovies, action.payload);
+    yield put(startLoading());
+    yield put(setError(''));
 
-    const posterLists: Image[][] = yield all(
-      searchResults.map((movie) => getMoviePosters(movie.id)),
-    );
+    try {
+      const searchResults: Movie[] = yield call(searchMovies, action.payload);
 
-    const movieList = searchResults.map((movie, index) => ({
-      movie,
-      poster:
-        posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
-        posterLists[index][0],
-    }));
+      const posterLists: Image[][] = yield all(
+        searchResults.map((movie) => getMoviePosters(movie.id)),
+      );
 
-    yield put(setSearchResults(movieList));
+      const movieList = searchResults.map((movie, index) => ({
+        movie,
+        poster:
+          posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
+          posterLists[index][0],
+      }));
 
-    timesSearched += 1;
-    if (!searchRefresh) 
-      searchRefresh = yield call(setTimeout, () => {
-        timesSearched = 0
-        searchRefresh = null;
-      }, 10_000);
+      yield put(setSearchResults(movieList));
+
+      timesSearched += 1;
+      if (!searchRefresh)
+        searchRefresh = yield call(
+          setTimeout,
+          () => {
+            timesSearched = 0;
+            searchRefresh = null;
+          },
+          10_000,
+        );
+    } catch (error) {
+      yield put(setError((error as { message: string }).message));
+    }
+
+    yield put(stopLoading());
   } else if (searchQuery === '') {
-    yield put(setSearchResults([]))
+    yield put(setSearchResults([]));
   }
 }
 

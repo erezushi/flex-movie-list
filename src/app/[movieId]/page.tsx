@@ -8,7 +8,7 @@ import { addFavorite, removeFavorite, setSingleMovie } from '@/store/slices/movi
 import genreIdList from './genreIds.json';
 
 import './page.css';
-import { IconButton } from '@mui/material';
+import { CircularProgress, IconButton } from '@mui/material';
 import Link from 'next/link';
 
 const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
@@ -16,9 +16,14 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
   const numberId = Number(movieId);
 
   const dispatch = useAppDispatch();
+
   const movieList = useAppSelector((state) => state.movies.movieList);
-  const movieObj = movieList.find((movieObj) => movieObj.movie.id === numberId);
   const favorites = useAppSelector((state) => state.movies.favorites);
+
+  const isLoading = useAppSelector((state) => state.request.isLoading);
+  const errorMessage = useAppSelector((state) => state.request.error);
+
+  const movieObj = movieList.find((movieObj) => movieObj.movie.id === numberId);
   const isInFavorites = favorites.includes(numberId);
 
   useEffect(() => {
@@ -36,6 +41,9 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
       document.body.removeEventListener('keydown', keyDownListener);
     };
   }, [keyDownListener]);
+  
+    if (isLoading) return <CircularProgress />
+    if (errorMessage) return <>{errorMessage}</>
 
   return (
     <main>
