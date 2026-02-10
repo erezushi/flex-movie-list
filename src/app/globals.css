@@ -1,42 +1,61 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+div.search-input>div {
+  border-radius: 2em;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+div.discovery-feed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-a {
-  color: inherit;
+div.movie-list {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+a.movie-link {
   text-decoration: none;
+  color: black;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+a.selected, button.selected {
+  border: solid black 3px
+}
+
+div.movie {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5em;
+  width: calc(25vw - 1.5em);
+}
+
+img.movie-poster {
+  width: 100%;
+  height: auto;
+}
+
+span.movie-title {
+  font-weight: bold;
+  text-align: center;
+}
+
+div.missing-poster {
+  margin: 0.5em;
+  width: calc(25vw - 1.5em);
+  height: calc((25vw - 1.5em) * 3 / 2);
+  background-color: #F4F4F4;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

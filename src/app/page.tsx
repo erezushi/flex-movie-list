@@ -1,66 +1,95 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+import { Button, TextField } from '@mui/material';
+import { ChangeEvent, useCallback } from 'react';
+import DiscoveryFeed from './components/DiscoveryFeed';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import {
+  displayFavorites,
+  displayPlaying,
+  displayPopular,
+} from '@/store/slices/movieSlice';
+import { setQuery } from '@/store/slices/searchSlice';
+
+let hoverTimeout: NodeJS.Timeout | null = null;
+
+const Home = () => {
+  const dispatch = useAppDispatch();
+
+  const displayMode = useAppSelector((state) => state.movies.displayMode);
+
+  const searchQuery = useAppSelector((state) => state.search.query);
+
+  const onPopularHover = useCallback(() => {
+    hoverTimeout = setTimeout(() => dispatch(displayPopular()), 2000);
+  }, [dispatch]);
+
+  const onPlayingHover = useCallback(() => {
+    hoverTimeout = setTimeout(() => dispatch(displayPlaying()), 2000);
+  }, [dispatch]);
+
+  const onFavoritesHover = useCallback(() => {
+    hoverTimeout = setTimeout(() => dispatch(displayFavorites()), 2000);
+  }, [dispatch]);
+
+  const onHoverLeave = useCallback(() => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+  }, []);
+
+  const onInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      dispatch(setQuery(event.target.value));
+    },
+    [dispatch],
   );
-}
+
+  return (
+    <main>
+      <Button
+        variant="text"
+        onClick={() => dispatch(displayPopular())}
+        onMouseEnter={onPopularHover}
+        onMouseLeave={onHoverLeave}
+        disabled={displayMode === 'popular'}
+        size="large"
+      >
+        Popular
+      </Button>
+      |
+      <Button
+        variant="text"
+        onClick={() => dispatch(displayPlaying())}
+        onMouseEnter={onPlayingHover}
+        onMouseLeave={onHoverLeave}
+        disabled={displayMode === 'playing'}
+        size="large"
+      >
+        Now Playing
+      </Button>
+      |
+      <Button
+        variant="text"
+        onClick={() => dispatch(displayFavorites())}
+        onMouseEnter={onFavoritesHover}
+        onMouseLeave={onHoverLeave}
+        disabled={displayMode === 'favorites'}
+        size="large"
+      >
+        Favorites
+      </Button>
+      <TextField
+        className="search-input"
+        variant="outlined"
+        value={searchQuery}
+        onChange={onInputChange}
+        label="Search"
+      />
+      <DiscoveryFeed />
+    </main>
+  );
+};
+
+export default Home;
