@@ -1,4 +1,10 @@
+a.back-button {
+  font-size: large;
+  color: blue
+}
+
 div.details {
+  margin-top: 1em;
   display: flex;
   align-items: center;
 }

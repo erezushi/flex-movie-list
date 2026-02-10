@@ -9,6 +9,7 @@ import genreIdList from './genreIds.json';
 
 import './page.css';
 import { IconButton } from '@mui/material';
+import Link from 'next/link';
 
 const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
   const { movieId } = use(params);
@@ -25,7 +26,8 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
   }, [dispatch, movieObj, numberId]);
 
   return (
-    <>
+    <main>
+      <Link href="/" className="back-button">↩ Back</Link>
       {movieObj && (
         <div className="details">
           {movieObj.poster ? (
@@ -72,7 +74,7 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
           </div>
         </div>
       )}
-    </>
+    </main>
   );
 };
 
