@@ -110,11 +110,11 @@ export function* watchDisplayChange() {
 }
 
 export function* watchDisplayFavorites() {
-  yield takeEvery([displayFavorites.type], fetchFavorites)
+  yield takeEvery(displayFavorites, fetchFavorites)
 }
 
 export function* watchSingleMovie() {
-  yield takeEvery([setSingleMovie.type], fetchSingleMovie);
+  yield takeEvery(setSingleMovie, fetchSingleMovie);
 }
 
 export default function* rootSaga() {
