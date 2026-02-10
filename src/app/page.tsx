@@ -20,6 +20,9 @@ import {
   LastPageRounded,
 } from '@mui/icons-material';
 import Link from 'next/link';
+import { useCallback } from 'react';
+
+let hoverTimeout: NodeJS.Timeout | null = null;
 
 const Home = () => {
   const dispatch = useAppDispatch();
@@ -28,12 +31,33 @@ const Home = () => {
   const totalPages = useAppSelector((state) => state.movies.totalPages);
   const movieList = useAppSelector((state) => state.movies.movieList);
 
+  const onPopularHover = useCallback(() => {
+    hoverTimeout = setTimeout(() => dispatch(displayPopular()), 2000);
+  }, [dispatch]);
+
+  const onPlayingHover = useCallback(() => {
+    hoverTimeout = setTimeout(() => dispatch(displayPlaying()), 2000);
+  }, [dispatch]);
+
+  const onFavoritesHover = useCallback(() => {
+    hoverTimeout = setTimeout(() => dispatch(displayFavorites()), 2000);
+  }, [dispatch]);
+
+  const onHoverLeave = useCallback(() => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+  }, []);
+
   return (
     <>
       <main>
         <Button
           variant="text"
           onClick={() => dispatch(displayPopular())}
+          onMouseEnter={onPopularHover}
+          onMouseLeave={onHoverLeave}
           disabled={displayMode === 'popular'}
         >
           Popular
@@ -42,6 +66,8 @@ const Home = () => {
         <Button
           variant="text"
           onClick={() => dispatch(displayPlaying())}
+          onMouseEnter={onPlayingHover}
+          onMouseLeave={onHoverLeave}
           disabled={displayMode === 'playing'}
         >
           Now Playing
@@ -50,6 +76,8 @@ const Home = () => {
         <Button
           variant="text"
           onClick={() => dispatch(displayFavorites())}
+          onMouseEnter={onFavoritesHover}
+          onMouseLeave={onHoverLeave}
           disabled={displayMode === 'favorites'}
         >
           Favorites
