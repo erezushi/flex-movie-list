@@ -33,5 +33,11 @@ export const getMoviePosters = async (movieId: number) => {
 export const getSingleMovie = async (movieId: number) => {
   const details = await tmdb.movies.details(movieId, undefined);
 
-  return details
-}
+  return details;
+};
+
+export const searchMovies = async (query: string) => {
+  const searchRes = await tmdb.search.movies({ query });
+
+  return searchRes.results;
+};

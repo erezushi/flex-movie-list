@@ -1,8 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import movies from './slices/movieSlice';
+import search from "./slices/searchSlice";
 
 const rootReducer = combineReducers({
-  movies
+  movies,
+  search
 });
 
 export type RootState = ReturnType<typeof rootReducer>

@@ -1,3 +1,7 @@
+div.search-input>div {
+  border-radius: 2em;
+}
+
 div.discovery-feed {
   display: flex;
   flex-direction: column;

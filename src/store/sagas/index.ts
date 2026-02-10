@@ -1,6 +1,6 @@
-import { all, call, put, select, takeEvery } from 'redux-saga/effects';
-import { Image } from 'tmdb-ts';
-import { discoverMovies, getMoviePosters, getSingleMovie } from '@/api';
+import { all, call, debounce, put, select, takeEvery } from 'redux-saga/effects';
+import { Image, Movie } from 'tmdb-ts';
+import { discoverMovies, getMoviePosters, getSingleMovie, searchMovies } from '@/api';
 import {
   addFavorite,
   displayPlaying,
@@ -17,6 +17,9 @@ import {
 } from '../slices/movieSlice';
 import type { MovieState, MovieDiscoverResults } from '@/types';
 import { PayloadAction } from '@reduxjs/toolkit';
+import { setQuery, setSearchResults } from '../slices/searchSlice';
+
+// Movie Sagas
 
 export function* saveFavorites() {
   const state: MovieState = yield select((state) => state.movies);
@@ -54,12 +57,12 @@ export function* fetchFavorites() {
   const state: MovieState = yield select((state) => state.movies);
 
   const movieDetails: Awaited<ReturnType<typeof getSingleMovie>>[] = yield all(
-    state.favorites.map((favoriteId) => getSingleMovie(favoriteId))
-  )
+    state.favorites.map((favoriteId) => getSingleMovie(favoriteId)),
+  );
 
   const posterLists: Image[][] = yield all(
     state.favorites.map((favoriteId) => getMoviePosters(favoriteId)),
-  )
+  );
 
   const movieList = movieDetails.map((movie, index) => ({
     movie,
@@ -110,11 +113,50 @@ export function* watchDisplayChange() {
 }
 
 export function* watchDisplayFavorites() {
-  yield takeEvery(displayFavorites, fetchFavorites)
+  yield takeEvery(displayFavorites, fetchFavorites);
 }
 
 export function* watchSingleMovie() {
   yield takeEvery(setSingleMovie, fetchSingleMovie);
+}
+
+// Search Sagas
+
+let timesSearched = 0;
+let searchRefresh: NodeJS.Timeout | null = null;
+
+export function* movieSearchWorker(action: PayloadAction<string>) {
+  const searchQuery = action.payload;
+
+  if (searchQuery.length >= 2 && timesSearched < 5) {
+    const searchResults: Movie[] = yield call(searchMovies, action.payload);
+
+    const posterLists: Image[][] = yield all(
+      searchResults.map((movie) => getMoviePosters(movie.id)),
+    );
+
+    const movieList = searchResults.map((movie, index) => ({
+      movie,
+      poster:
+        posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
+        posterLists[index][0],
+    }));
+
+    yield put(setSearchResults(movieList));
+
+    timesSearched += 1;
+    if (!searchRefresh) 
+      searchRefresh = yield call(setTimeout, () => {
+        timesSearched = 0
+        searchRefresh = null;
+      }, 10_000);
+  } else if (searchQuery === '') {
+    yield put(setSearchResults([]))
+  }
+}
+
+export function* watchSearchQuery() {
+  yield debounce(500, setQuery, movieSearchWorker);
 }
 
 export default function* rootSaga() {
@@ -123,5 +165,6 @@ export default function* rootSaga() {
     watchDisplayChange(),
     watchSingleMovie(),
     watchDisplayFavorites(),
+    watchSearchQuery(),
   ]);
 }

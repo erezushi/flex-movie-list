@@ -20,3 +20,8 @@ export interface MovieState {
   favorites: number[];
   singleMovie?: number;
 }
+
+export interface SearchState {
+  query: string;
+  results: MovieWithPoster[];
+}

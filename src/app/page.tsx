@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, IconButton } from '@mui/material';
+import { Button, IconButton, TextField } from '@mui/material';
 import Image from 'next/image';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -20,16 +20,23 @@ import {
   LastPageRounded,
 } from '@mui/icons-material';
 import Link from 'next/link';
-import { useCallback } from 'react';
+import { ChangeEvent, useCallback } from 'react';
+import { setQuery } from '@/store/slices/searchSlice';
 
 let hoverTimeout: NodeJS.Timeout | null = null;
 
 const Home = () => {
   const dispatch = useAppDispatch();
+
   const displayMode = useAppSelector((state) => state.movies.displayMode);
   const currentPage = useAppSelector((state) => state.movies.currentPage);
   const totalPages = useAppSelector((state) => state.movies.totalPages);
   const movieList = useAppSelector((state) => state.movies.movieList);
+  
+  const searchQuery = useAppSelector((state) => state.search.query);
+  const searchResults = useAppSelector((state) => state.search.results);
+
+  const displayList = searchResults.length ? searchResults : movieList;
 
   const onPopularHover = useCallback(() => {
     hoverTimeout = setTimeout(() => dispatch(displayPopular()), 2000);
@@ -50,6 +57,13 @@ const Home = () => {
     }
   }, []);
 
+  const onInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      dispatch(setQuery(event.target.value));
+    },
+    [dispatch],
+  );
+
   return (
     <>
       <main>
@@ -59,6 +73,7 @@ const Home = () => {
           onMouseEnter={onPopularHover}
           onMouseLeave={onHoverLeave}
           disabled={displayMode === 'popular'}
+          size="large"
         >
           Popular
         </Button>
@@ -69,6 +84,7 @@ const Home = () => {
           onMouseEnter={onPlayingHover}
           onMouseLeave={onHoverLeave}
           disabled={displayMode === 'playing'}
+          size="large"
         >
           Now Playing
         </Button>
@@ -79,12 +95,20 @@ const Home = () => {
           onMouseEnter={onFavoritesHover}
           onMouseLeave={onHoverLeave}
           disabled={displayMode === 'favorites'}
+          size="large"
         >
           Favorites
         </Button>
+        <TextField
+          className="search-input"
+          variant="outlined"
+          value={searchQuery}
+          onChange={onInputChange}
+          label="Search"
+        />
         <div className="discovery-feed">
           <div className="movie-list">
-            {movieList.map((movieObj) => (
+            {displayList.map((movieObj) => (
               <Link
                 href={movieObj.movie.id.toString()}
                 key={movieObj.movie.id}
