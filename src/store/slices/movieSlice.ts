@@ -3,7 +3,9 @@ import { discoverMovies, getMoviePosters } from '@/api';
 
 import type { MovieWithPoster, MovieState } from '@/types';
 
-const localFavorites = localStorage?.getItem('favorites');
+let localFavorites: string | null = null;
+if (typeof window !== 'undefined')
+  localFavorites = localStorage?.getItem('favorites');
 
 const discoverRes = await discoverMovies('popular', 1);
 const posterLists = await Promise.all(discoverRes.movies.map((movieObj) => getMoviePosters(movieObj.id)));

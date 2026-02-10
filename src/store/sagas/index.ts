@@ -26,7 +26,8 @@ import type { MovieState, MovieDiscoverResults } from '@/types';
 export function* saveFavorites() {
   const state: MovieState = yield select((state) => state.movies);
 
-  yield call(localStorage?.setItem, 'favorites', JSON.stringify(state.favorites));
+  if (typeof window !== 'undefined')
+    yield call(localStorage.setItem, 'favorites', JSON.stringify(state.favorites));
 }
 
 export function* fetchMovieList() {
