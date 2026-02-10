@@ -1,3 +1,7 @@
+body {
+  overflow-y: hidden;
+}
+
 div.search-input>div {
   border-radius: 2em;
 }
@@ -19,6 +23,10 @@ div.movie-list {
 a.movie-link {
   text-decoration: none;
   color: black;
+}
+
+a.selected, button.selected {
+  border: solid black 3px
 }
 
 div.movie {

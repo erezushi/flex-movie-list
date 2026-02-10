@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { use, useEffect } from 'react';
+import { use, useCallback, useEffect } from 'react';
 import { ImageNotSupportedRounded, StarOutlineRounded, StarRounded } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addFavorite, removeFavorite, setSingleMovie } from '@/store/slices/movieSlice';
@@ -25,9 +25,23 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
     if (!movieObj) dispatch(setSingleMovie(numberId));
   }, [dispatch, movieObj, numberId]);
 
+  const keyDownListener = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'Escape')
+      (document.querySelector('a.back-button') as HTMLAnchorElement).click();
+  }, []);
+
+  useEffect(() => {
+    document.body.addEventListener('keydown', keyDownListener);
+    return () => {
+      document.body.removeEventListener('keydown', keyDownListener);
+    };
+  }, [keyDownListener]);
+
   return (
     <main>
-      <Link href="/" className="back-button">↩ Back</Link>
+      <Link href="/" className="back-button">
+        ↩ Back
+      </Link>
       {movieObj && (
         <div className="details">
           {movieObj.poster ? (
@@ -64,7 +78,7 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
             <br />
             {isInFavorites ? (
               <IconButton onClick={() => dispatch(removeFavorite(numberId))}>
-                <StarRounded sx={{color: '#FFFF00'}} />
+                <StarRounded sx={{ color: '#FFFF00' }} />
               </IconButton>
             ) : (
               <IconButton onClick={() => dispatch(addFavorite(numberId))}>
