@@ -13,6 +13,7 @@ import {
   setMovieList,
   setTotalPages,
   setSingleMovie,
+  displayFavorites,
 } from '../slices/movieSlice';
 import type { MovieState, MovieDiscoverResults } from '@/types';
 import { PayloadAction } from '@reduxjs/toolkit';
@@ -47,6 +48,27 @@ export function* fetchMovieList() {
 
   // TMDB API only accepts pages up to 500, even if it returns more than that
   yield put(setTotalPages(Math.min(discoverRes.pages, 500)));
+}
+
+export function* fetchFavorites() {
+  const state: MovieState = yield select((state) => state.movies);
+
+  const movieDetails: Awaited<ReturnType<typeof getSingleMovie>>[] = yield all(
+    state.favorites.map((favoriteId) => getSingleMovie(favoriteId))
+  )
+
+  const posterLists: Image[][] = yield all(
+    state.favorites.map((favoriteId) => getMoviePosters(favoriteId)),
+  )
+
+  const movieList = movieDetails.map((movie, index) => ({
+    movie,
+    poster:
+      posterLists[index].find((poster) => poster.file_path === movie.poster_path) ??
+      posterLists[index][0],
+  }));
+
+  yield put(setMovieList(movieList));
 }
 
 export function* fetchSingleMovie(action: PayloadAction<number>) {
@@ -87,10 +109,19 @@ export function* watchDisplayChange() {
   );
 }
 
+export function* watchDisplayFavorites() {
+  yield takeEvery([displayFavorites.type], fetchFavorites)
+}
+
 export function* watchSingleMovie() {
   yield takeEvery([setSingleMovie.type], fetchSingleMovie);
 }
 
 export default function* rootSaga() {
-  yield all([watchFavoritesChange(), watchDisplayChange(), watchSingleMovie()]);
+  yield all([
+    watchFavoritesChange(),
+    watchDisplayChange(),
+    watchSingleMovie(),
+    watchDisplayFavorites(),
+  ]);
 }

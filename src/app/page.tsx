@@ -54,40 +54,38 @@ const Home = () => {
         >
           Favorites
         </Button>
-        {displayMode === 'favorites' ? (
-          <></>
-        ) : (
-          <div className="discovery-feed">
-            <div className="movie-list">
-              {movieList.map((movieObj) => (
-                <Link
-                  href={movieObj.movie.id.toString()}
-                  key={movieObj.movie.id}
-                  className="movie-link"
-                >
-                  <div className="movie">
-                    {movieObj.poster ? (
-                      <Image
-                        className="movie-poster"
-                        alt={`${movieObj.movie.title} poster`}
-                        src={`https://image.tmdb.org/t/p/original${movieObj.poster.file_path}`}
-                        width={movieObj.poster.width}
-                        height={movieObj.poster.height}
-                      />
-                    ) : (
-                      <div className="missing-poster">
-                        <ImageNotSupportedRounded fontSize="large" />
-                        Poster Missing
-                      </div>
-                    )}
-                    <span className="movie-title">{movieObj.movie.title}</span>
-                    <span className="release-year">
-                      {movieObj.movie.release_date.substring(0, 4)}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+        <div className="discovery-feed">
+          <div className="movie-list">
+            {movieList.map((movieObj) => (
+              <Link
+                href={movieObj.movie.id.toString()}
+                key={movieObj.movie.id}
+                className="movie-link"
+              >
+                <div className="movie">
+                  {movieObj.poster ? (
+                    <Image
+                      className="movie-poster"
+                      alt={`${movieObj.movie.title} poster`}
+                      src={`https://image.tmdb.org/t/p/original${movieObj.poster.file_path}`}
+                      width={movieObj.poster.width}
+                      height={movieObj.poster.height}
+                    />
+                  ) : (
+                    <div className="missing-poster">
+                      <ImageNotSupportedRounded fontSize="large" />
+                      Poster Missing
+                    </div>
+                  )}
+                  <span className="movie-title">{movieObj.movie.title}</span>
+                  <span className="release-year">
+                    {movieObj.movie.release_date.substring(0, 4)}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {displayMode !== 'favorites' && (
             <div className="pagination">
               <IconButton onClick={() => dispatch(firstPage())} disabled={currentPage <= 2}>
                 <FirstPageRounded />
@@ -106,8 +104,8 @@ const Home = () => {
                 <LastPageRounded />
               </IconButton>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
     </>
   );
