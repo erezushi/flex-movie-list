@@ -1,15 +1,16 @@
 'use client';
 
-import Image from 'next/image';
-import { use, useCallback, useEffect } from 'react';
 import { ImageNotSupportedRounded, StarOutlineRounded, StarRounded } from '@mui/icons-material';
+import { CircularProgress, IconButton } from '@mui/material';
+import Image from 'next/image';
+import Link from 'next/link';
+import { use, useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addFavorite, removeFavorite, setSingleMovie } from '@/store/slices/movieSlice';
+
 import genreIdList from './genreIds.json';
 
 import './page.css';
-import { CircularProgress, IconButton } from '@mui/material';
-import Link from 'next/link';
 
 const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
   const { movieId } = use(params);

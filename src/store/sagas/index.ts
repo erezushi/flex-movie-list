@@ -1,6 +1,6 @@
+import { PayloadAction } from '@reduxjs/toolkit';
 import { all, call, debounce, put, select, takeEvery } from 'redux-saga/effects';
 import { Image, Movie } from 'tmdb-ts';
-import { discoverMovies, getMoviePosters, getSingleMovie, searchMovies } from '@/api';
 import {
   addFavorite,
   displayPlaying,
@@ -15,10 +15,11 @@ import {
   setSingleMovie,
   displayFavorites,
 } from '../slices/movieSlice';
-import type { MovieState, MovieDiscoverResults } from '@/types';
-import { PayloadAction } from '@reduxjs/toolkit';
-import { setQuery, setSearchResults } from '../slices/searchSlice';
 import { setError, startLoading, stopLoading } from '../slices/requestSlice';
+import { setQuery, setSearchResults } from '../slices/searchSlice';
+import { discoverMovies, getMoviePosters, getSingleMovie, searchMovies } from '@/api';
+
+import type { MovieState, MovieDiscoverResults } from '@/types';
 
 // Movie Sagas
 

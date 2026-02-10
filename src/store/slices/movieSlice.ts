@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MovieWithPoster, MovieState } from '@/types';
 import { discoverMovies, getMoviePosters } from '@/api';
+
+import type { MovieWithPoster, MovieState } from '@/types';
 
 const localFavorites = localStorage.getItem('favorites');
 

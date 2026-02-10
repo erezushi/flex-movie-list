@@ -1,5 +1,5 @@
-import { Inter } from 'next/font/google';
 import { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import StoreProvider from './components/StoreProvider';
 
 import './globals.css';

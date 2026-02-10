@@ -1,15 +1,15 @@
 'use client';
 
 import { Button, TextField } from '@mui/material';
+import { ChangeEvent, useCallback } from 'react';
+import DiscoveryFeed from './components/DiscoveryFeed';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   displayFavorites,
   displayPlaying,
   displayPopular,
 } from '@/store/slices/movieSlice';
-import { ChangeEvent, useCallback } from 'react';
 import { setQuery } from '@/store/slices/searchSlice';
-import DiscoveryFeed from './components/DiscoveryFeed';
 
 let hoverTimeout: NodeJS.Timeout | null = null;
 

@@ -1,5 +1,6 @@
 import { TMDB } from 'tmdb-ts';
-import { DisplayMode, MovieDiscoverResults } from './types';
+
+import type { DisplayMode, MovieDiscoverResults } from './types';
 
 const tmdb = new TMDB(process.env.NEXT_PUBLIC_TMDB_API_KEY!);
 

@@ -1,7 +1,5 @@
 'use client';
 
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { firstPage, lastPage, nextPage, previousPage } from '@/store/slices/movieSlice';
 import {
   ChevronLeftRounded,
   ChevronRightRounded,
@@ -13,6 +11,8 @@ import { CircularProgress, IconButton } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MouseEvent, useCallback, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { firstPage, lastPage, nextPage, previousPage } from '@/store/slices/movieSlice';
 
 const DiscoveryFeed = () => {
   const dispatch = useAppDispatch();

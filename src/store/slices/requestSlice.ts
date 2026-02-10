@@ -1,5 +1,6 @@
-import { RequestState } from '@/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import type { RequestState } from '@/types';
 
 const initialState: RequestState = {
   isLoading: false,
