@@ -90,10 +90,10 @@ const Home = () => {
 
         case 'ArrowDown':
           setSelectedElement((currentSelection) => {
-            const selectedElementHeight = document.querySelector('.selected')!.clientHeight;
-            window.scrollBy({ top: selectedElementHeight });
-
             if (currentSelection.startsWith('Movie')) {
+              const selectedElementHeight = document.querySelector('.selected')!.clientHeight;
+              window.scrollBy({ top: selectedElementHeight });
+
               const selectedMovieIndex = Number(currentSelection.substring(5));
 
               if (selectedMovieIndex >= displayList.length - 4) {
