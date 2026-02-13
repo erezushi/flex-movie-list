@@ -71,8 +71,7 @@ const Home = () => {
           setSelectedElement((currentSelection) => {
             if (currentSelection.startsWith('Movie')) {
               const selectedElementHeight = document.querySelector('.selected')!.clientHeight;
-              // For some reason, this scroll doubles, so the value is halved here.
-              window.scrollBy({ top: -selectedElementHeight / 2 });
+              window.scrollBy({ top: -selectedElementHeight });
 
               const selectedMovieIndex = Number(currentSelection.substring(5));
 
@@ -92,7 +91,7 @@ const Home = () => {
         case 'ArrowDown':
           setSelectedElement((currentSelection) => {
             const selectedElementHeight = document.querySelector('.selected')!.clientHeight;
-            window.scrollBy({ top: selectedElementHeight / 2 });
+            window.scrollBy({ top: selectedElementHeight });
 
             if (currentSelection.startsWith('Movie')) {
               const selectedMovieIndex = Number(currentSelection.substring(5));
@@ -123,7 +122,7 @@ const Home = () => {
 
               if (selectedMovieIndex % 4 === 0) {
                 const selectedElementHeight = document.querySelector('.selected')!.clientHeight;
-                window.scrollBy({ top: -selectedElementHeight / 2 });
+                window.scrollBy({ top: -selectedElementHeight });
               }
 
               if (selectedMovieIndex === 0) return 'Search';
@@ -147,7 +146,7 @@ const Home = () => {
 
               if (selectedMovieIndex % 4 === 3) {
                 const selectedElementHeight = document.querySelector('.selected')!.clientHeight;
-                window.scrollBy({ top: selectedElementHeight / 2 });
+                window.scrollBy({ top: selectedElementHeight });
               }
 
               if (selectedMovieIndex === displayList.length - 1)
