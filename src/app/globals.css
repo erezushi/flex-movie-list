@@ -2,8 +2,12 @@ body {
   overflow-y: hidden;
 }
 
+div.search-input {
+  margin: 0 0 0.5em 0.5em
+}
+
 div.search-input>div {
-  border-radius: 2em;
+  border-radius: 1em;
 }
 
 div.discovery-feed {
@@ -25,8 +29,9 @@ a.movie-link {
   color: black;
 }
 
-a.selected, button.selected {
-  border: solid black 3px
+a.selected, button.selected, div.selected {
+  border: solid black 3px;
+  border-radius: 1.5em;
 }
 
 div.movie {

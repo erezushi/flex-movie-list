@@ -10,11 +10,19 @@ import {
 import { CircularProgress, IconButton } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MouseEvent, useCallback, useEffect, useState } from 'react';
+import { Dispatch, MouseEvent, SetStateAction, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { firstPage, lastPage, nextPage, previousPage } from '@/store/slices/movieSlice';
 
-const DiscoveryFeed = () => {
+interface DiscoveryFeedProps {
+  selectedElement: string;
+  setSelectedElement: Dispatch<SetStateAction<string>>;
+}
+
+const DiscoveryFeed = ({
+  selectedElement,
+  setSelectedElement,
+}: DiscoveryFeedProps) => {
   const dispatch = useAppDispatch();
 
   const displayMode = useAppSelector((state) => state.movies.displayMode);
@@ -29,98 +37,30 @@ const DiscoveryFeed = () => {
 
   const displayList = searchResults.length ? searchResults : movieList;
 
-  const [selectedElement, setSelectedElement] = useState(0);
-
-  const keyDownListener = useCallback(
-    (event: KeyboardEvent) => {
-      console.log(`here ${event.key}`);
-
-      switch (event.key) {
-        case 'Tab':
-          event.preventDefault();
+  const onPageChangeClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      switch (event.currentTarget.name) {
+        case 'first-page':
+          dispatch(firstPage());
           break;
-        case 'ArrowUp':
-          setSelectedElement((current) => {
-            const newState = Math.max(current - 4, 0);
-
-            if (current < displayList.length) window.scrollBy({ top: -300 });
-
-            return newState;
-          });
+        case 'previous-page':
+          dispatch(previousPage());
           break;
-        case 'ArrowDown':
-          setSelectedElement((current) => {
-            const newState = Math.min(current + 4, displayList.length + 3);
-
-            if (newState < displayList.length) window.scrollBy({ top: 300 });
-
-            return newState;
-          });
+        case 'next-page':
+          dispatch(nextPage());
           break;
-        case 'ArrowRight':
-          setSelectedElement((current) => {
-            const newState = Math.min(current + 1, displayList.length + 3);
-
-            if (newState < displayList.length) {
-              const currentRow = Math.floor(current / 4);
-              const newRow = Math.floor(newState / 4);
-
-              if (currentRow !== newRow) window.scrollBy({ top: 300 });
-            }
-
-            return newState;
-          });
-          break;
-        case 'ArrowLeft':
-          setSelectedElement((current) => {
-            const newState = Math.max(current - 1, 0);
-
-            if (current < displayList.length) {
-              const currentRow = Math.floor(current / 4);
-              const newRow = Math.floor(newState / 4);
-
-              if (currentRow !== newRow) window.scrollBy({ top: -300 });
-            }
-
-            return newState;
-          });
-          break;
-        case 'Enter':
-          (document.querySelector('.selected') as HTMLAnchorElement | HTMLButtonElement).click();
+        case 'last-page':
+          dispatch(lastPage());
           break;
       }
+
+      setSelectedElement('Movie0');
     },
-    [displayList.length],
+    [dispatch, setSelectedElement],
   );
 
-  useEffect(() => {
-    document.body.addEventListener('keydown', keyDownListener);
-    return () => {
-      document.body.removeEventListener('keydown', keyDownListener);
-    };
-  }, [keyDownListener]);
-
-  const onPageChangeClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    switch (event.currentTarget.name) {
-      case "first-page":
-        dispatch(firstPage());
-        break;
-      case "previous-page":
-        dispatch(previousPage());
-        break;
-      case "next-page":
-        dispatch(nextPage());
-        break;
-      case "last-page":
-        dispatch(lastPage());
-        break;
-    }
-
-    setSelectedElement(0);
-  }, [dispatch]);
-
-  if (isLoading) return <CircularProgress />
-  if (errorMessage) return <>{errorMessage}</>
+  if (isLoading) return <CircularProgress />;
+  if (errorMessage) return <>{errorMessage}</>;
 
   return (
     <div className="discovery-feed">
@@ -129,7 +69,7 @@ const DiscoveryFeed = () => {
           <Link
             href={movieObj.movie.id.toString()}
             key={movieObj.movie.id}
-            className={`movie-link${selectedElement === index ? ' selected' : ''}`}
+            className={`movie-link${selectedElement === `Movie${index}` ? ' selected' : ''}`}
           >
             <div className="movie">
               {movieObj.poster ? (
@@ -155,7 +95,7 @@ const DiscoveryFeed = () => {
       {displayMode !== 'favorites' && (
         <div className="pagination">
           <IconButton
-            className={selectedElement === displayList.length ? 'selected' : ''}
+            className={selectedElement === 'First Page' ? 'selected' : ''}
             onClick={onPageChangeClick}
             name="first-page"
             disabled={currentPage <= 2}
@@ -163,7 +103,7 @@ const DiscoveryFeed = () => {
             <FirstPageRounded />
           </IconButton>
           <IconButton
-            className={selectedElement === displayList.length + 1 ? 'selected' : ''}
+            className={selectedElement === 'Previous Page' ? 'selected' : ''}
             onClick={onPageChangeClick}
             name="previous-page"
             disabled={currentPage <= 1}
@@ -172,7 +112,7 @@ const DiscoveryFeed = () => {
           </IconButton>
           {currentPage} / {totalPages}
           <IconButton
-            className={selectedElement === displayList.length + 2 ? 'selected' : ''}
+            className={selectedElement === 'Next Page' ? 'selected' : ''}
             onClick={onPageChangeClick}
             name="next-page"
             disabled={currentPage >= totalPages}
@@ -180,7 +120,7 @@ const DiscoveryFeed = () => {
             <ChevronRightRounded />
           </IconButton>
           <IconButton
-            className={selectedElement === displayList.length + 3 ? 'selected' : ''}
+            className={selectedElement === 'Last Page' ? 'selected' : ''}
             onClick={onPageChangeClick}
             name="last-page"
             disabled={currentPage >= totalPages - 1}

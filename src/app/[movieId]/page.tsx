@@ -4,7 +4,7 @@ import { ImageNotSupportedRounded, StarOutlineRounded, StarRounded } from '@mui/
 import { CircularProgress, IconButton } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import { use, useCallback, useEffect } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addFavorite, removeFavorite, setSingleMovie } from '@/store/slices/movieSlice';
 
@@ -27,6 +27,8 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
   const movieObj = movieList.find((movieObj) => movieObj.movie.id === numberId);
   const isInFavorites = favorites.includes(numberId);
 
+  const [selectedElement, setSelectedElement] = useState<'Back' | 'Favorite'>('Favorite');
+
   useEffect(() => {
     if (!movieObj) dispatch(setSingleMovie(numberId));
   }, [dispatch, movieObj, numberId]);
@@ -34,6 +36,10 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
   const keyDownListener = useCallback((event: KeyboardEvent) => {
     if (event.key === 'Escape')
       (document.querySelector('a.back-button') as HTMLAnchorElement).click();
+    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') setSelectedElement('Back');
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') setSelectedElement('Favorite');
+    if (event.key === 'Enter')
+      (document.querySelector('.selected') as HTMLAnchorElement | HTMLButtonElement).click();
   }, []);
 
   useEffect(() => {
@@ -42,13 +48,13 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
       document.body.removeEventListener('keydown', keyDownListener);
     };
   }, [keyDownListener]);
-  
-    if (isLoading) return <CircularProgress />
-    if (errorMessage) return <>{errorMessage}</>
+
+  if (isLoading) return <CircularProgress />;
+  if (errorMessage) return <>{errorMessage}</>;
 
   return (
     <main>
-      <Link href="/" className="back-button">
+      <Link href="/" className={`back-button${selectedElement === 'Back' ? ' selected' : ''}`}>
         ↩ Back
       </Link>
       {movieObj && (
@@ -86,11 +92,17 @@ const Page = ({ params }: { params: Promise<{ movieId: string }> }) => {
             <span className="movie-overview">{movieObj.movie.overview}</span>
             <br />
             {isInFavorites ? (
-              <IconButton onClick={() => dispatch(removeFavorite(numberId))}>
+              <IconButton
+                className={selectedElement === 'Favorite' ? 'selected' : ''}
+                onClick={() => dispatch(removeFavorite(numberId))}
+              >
                 <StarRounded sx={{ color: '#FFFF00' }} />
               </IconButton>
             ) : (
-              <IconButton onClick={() => dispatch(addFavorite(numberId))}>
+              <IconButton
+                className={selectedElement === 'Favorite' ? 'selected' : ''}
+                onClick={() => dispatch(addFavorite(numberId))}
+              >
                 <StarOutlineRounded />
               </IconButton>
             )}
