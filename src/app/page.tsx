@@ -61,6 +61,7 @@ const Home = () => {
   const keyDownListener = useCallback(
     (event: KeyboardEvent) => {
       const displayList = searchResults.length ? searchResults : movieList;
+      const searchInputField = document.querySelector('.search-input input') as HTMLInputElement;
 
       switch (event.key) {
         case 'Tab':
@@ -129,6 +130,11 @@ const Home = () => {
 
               return `Movie${selectedMovieIndex - 1}`;
             }
+            if (currentSelection === 'Search') {
+              if (searchInputField.selectionStart === 0) return 'Favorites';
+
+              return currentSelection;
+            }
 
             const selectedElementIndex = selectableElements.indexOf(currentSelection);
             const previousElement = selectableElements[Math.max(selectedElementIndex - 1, 0)];
@@ -154,6 +160,11 @@ const Home = () => {
 
               return `Movie${selectedMovieIndex + 1}`;
             }
+            if (currentSelection === 'Search') {
+              if (searchInputField.selectionStart === searchQuery.length) return 'Movie0';
+
+              return currentSelection;
+            }
 
             const selectedElementIndex = selectableElements.indexOf(currentSelection);
             const nextElement =
@@ -166,14 +177,11 @@ const Home = () => {
           break;
 
         case 'Enter':
-          if (selectedElement === 'Search')
-            (document.querySelector('.selected input') as HTMLInputElement).focus();
-          else
-            (document.querySelector('.selected') as HTMLAnchorElement | HTMLButtonElement).click();
+          (document.querySelector('.selected') as HTMLAnchorElement | HTMLButtonElement).click();
           break;
       }
     },
-    [displayMode, movieList, searchResults, selectedElement],
+    [displayMode, movieList, searchQuery, searchResults],
   );
 
   useEffect(() => {
@@ -184,10 +192,13 @@ const Home = () => {
   }, [keyDownListener]);
 
   useEffect(() => {
+    const searchInputField = document.querySelector('.search-input input') as HTMLInputElement;
+
     if (hoverTimeout) {
       clearTimeout(hoverTimeout);
       hoverTimeout = null;
     }
+    searchInputField.blur();
 
     const selectedElementIndex = selectableElements.indexOf(selectedElement);
 
@@ -195,7 +206,7 @@ const Home = () => {
       hoverTimeout = setTimeout(() => {
         (document.querySelector('Button.selected') as HTMLButtonElement)?.click();
       }, 2000);
-    }
+    } else if (selectedElementIndex === 3) searchInputField.focus();
   }, [dispatch, selectedElement]);
 
   return (
